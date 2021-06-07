@@ -204,13 +204,11 @@ public class Controller : MonoBehaviour
         clickedTile = robber.GetComponent<RobberMove>().currentTile;
         tiles[clickedTile].current = true;
         FindSelectableTiles(false);
-
-        /*TODO: Cambia el código de abajo para hacer lo siguiente
+        /*TODO: Cambia el código de abajo para hacer lo siguiente   
         - Elegimos una casilla aleatoria entre las seleccionables que puede ir el caco
         - Movemos al caco a esa casilla
         - Actualizamos la variable currentTile del caco a la nueva casilla
         */
-        robber.GetComponent<RobberMove>().MoveToTile(tiles[robber.GetComponent<RobberMove>().currentTile]);
     }
 
     public void EndGame(bool end)
@@ -257,6 +255,7 @@ public class Controller : MonoBehaviour
         int indexcurrentTile;
         int elOtroCop = 2;
         List<int> adyacentes = new List<int>();
+        List<int> casillasRobber = new List<int>();
 
         if (cop == true) {
 
@@ -268,42 +267,24 @@ public class Controller : MonoBehaviour
             else
             {
                 elOtroCop = 0;
-            }        
-            
-        }
+            }
 
-        else
-        {
-            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
-        }
-        
-            //La ponemos rosa porque acabamos de hacer un reset
-            tiles[indexcurrentTile].current = true;
-
-        //Cola para el BFS
-        Queue<Tile> nodes = new Queue<Tile>();
-
-        //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
-        //Tendrás que cambiar este código por el BFS
-
-        for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
-        {
-            adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
-        }
-
-        adyacentes.Add(indexcurrentTile);
-        
-        for(int i = 0; i < adyacentes.Count; i++)
-        {
-            //Debug.Log(adyacentes[i].ToString());
-        }
-
-        
-        for(int j = 0; j < adyacentes.Count; j++)
-        {
-            for (int i = 0;  i < tiles[adyacentes[j]].adjacency.Count; i++)
+            for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
             {
-                if(elOtroCop != 2)
+                adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
+            }
+
+            adyacentes.Add(indexcurrentTile);
+
+            for (int i = 0; i < adyacentes.Count; i++)
+            {
+                //Debug.Log(adyacentes[i].ToString());
+            }
+
+
+            for (int j = 0; j < adyacentes.Count; j++)
+            {
+                for (int i = 0; i < tiles[adyacentes[j]].adjacency.Count; i++)
                 {
                     if (!(cops[elOtroCop].GetComponent<CopMove>().currentTile == adyacentes[j]))
                     {
@@ -315,14 +296,44 @@ public class Controller : MonoBehaviour
                         tiles[cops[elOtroCop].GetComponent<CopMove>().currentTile].selectable = false;
                     }
                 }
-                
-                else
+            }
+
+        }
+
+        else
+        {
+            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
+
+            for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
+            {
+                adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
+            }
+
+            adyacentes.Add(indexcurrentTile);
+
+            for (int j = 0; j < adyacentes.Count; j++)
+            {
+                for (int i = 0; i < tiles[adyacentes[j]].adjacency.Count; i++)
                 {
                     tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                    casillasRobber.Add(tiles[adyacentes[j]].adjacency[i]);
                 }
-                
             }
+
+            int casilla = Random.Range(0, casillasRobber.Count);
+            robber.GetComponent<RobberMove>().MoveToTile(tiles[casillasRobber[casilla]]);
+            robber.GetComponent<RobberMove>().currentTile = casillasRobber[casilla];
         }
+        
+        //La ponemos rosa porque acabamos de hacer un reset
+        tiles[indexcurrentTile].current = true;
+
+        //Cola para el BFS
+        Queue<Tile> nodes = new Queue<Tile>();
+
+        //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
+        //Tendrás que cambiar este código por el BFS
+
         /*
         for (int i = 0; i < Constants.NumTiles; i++)
         {
@@ -340,13 +351,13 @@ public class Controller : MonoBehaviour
         }
         */
     }
-    
-   
-    
 
-    
 
-   
 
-       
+
+
+
+
+
+
 }
