@@ -76,11 +76,11 @@ public class Controller : MonoBehaviour
                 {
                     tiles[i].adjacency.Add(i - 8);
                 }
-                if (!(i + 1 < 0))
+                if (!(i + 1 > 63))
                 {
                     tiles[i].adjacency.Add(i + 1);
                 }
-                if (!(i + 8 < 0))
+                if (!(i + 8 > 63))
                 {
                     tiles[i].adjacency.Add(i + 8);
                 }
@@ -95,7 +95,7 @@ public class Controller : MonoBehaviour
                 {
                     tiles[i].adjacency.Add(i - 8);
                 }
-                if (!(i + 8 < 0))
+                if (!(i + 8 > 63))
                 {
                     tiles[i].adjacency.Add(i + 8);
                 }
@@ -110,11 +110,11 @@ public class Controller : MonoBehaviour
                 {
                     tiles[i].adjacency.Add(i - 8);
                 }
-                if (!(i + 1 < 0))
+                if (!(i + 1 > 63))
                 {
                     tiles[i].adjacency.Add(i + 1);
                 }
-                if (!(i + 8 < 0))
+                if (!(i + 8 > 63))
                 {
                     tiles[i].adjacency.Add(i + 8);
                 }
@@ -255,16 +255,30 @@ public class Controller : MonoBehaviour
     {
                  
         int indexcurrentTile;
+        int elOtroCop = 2;
         List<int> adyacentes = new List<int>();
 
-        //if (cop==true)
-            indexcurrentTile = cops[clickedCop].GetComponent<CopMove>().currentTile;
-        /*
-        else
-            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;*/
+        if (cop == true) {
 
-        //La ponemos rosa porque acabamos de hacer un reset
-        tiles[indexcurrentTile].current = true;
+            indexcurrentTile = cops[clickedCop].GetComponent<CopMove>().currentTile;
+            if (clickedCop == 0)
+            {
+                elOtroCop = 1;
+            }
+            else
+            {
+                elOtroCop = 0;
+            }        
+            
+        }
+
+        else
+        {
+            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
+        }
+        
+            //La ponemos rosa porque acabamos de hacer un reset
+            tiles[indexcurrentTile].current = true;
 
         //Cola para el BFS
         Queue<Tile> nodes = new Queue<Tile>();
@@ -281,7 +295,7 @@ public class Controller : MonoBehaviour
         
         for(int i = 0; i < adyacentes.Count; i++)
         {
-            Debug.Log(adyacentes[i].ToString());
+            //Debug.Log(adyacentes[i].ToString());
         }
 
         
@@ -289,7 +303,24 @@ public class Controller : MonoBehaviour
         {
             for (int i = 0;  i < tiles[adyacentes[j]].adjacency.Count; i++)
             {
-                tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                if(elOtroCop != 2)
+                {
+                    if (!(cops[elOtroCop].GetComponent<CopMove>().currentTile == adyacentes[j]))
+                    {
+                        /*&& !(cops[elOtroCop].GetComponent<CopMove>().currentTile == tiles[adyacentes[j]].adjacency[i])
+                        Debug.Log("Adyacentes con j " + adyacentes[j]);
+                        Debug.Log("Adyacentes con i " + tiles[adyacentes[j]].adjacency[i]);
+                        */
+                        tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                        tiles[cops[elOtroCop].GetComponent<CopMove>().currentTile].selectable = false;
+                    }
+                }
+                
+                else
+                {
+                    tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                }
+                
             }
         }
         /*
