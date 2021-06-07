@@ -50,12 +50,77 @@ public class Controller : MonoBehaviour
     {
         //Matriz de adyacencia
         int[,] matriu = new int[Constants.NumTiles, Constants.NumTiles];
+        //int[,] matriu = new int[Constants.TilesPerRow, Constants.TilesPerRow];
 
-        //TODO: Inicializar matriz a 0's
-
+        //TODO: Inicializar matriz a 0's        
+        
+        for(int i=0; i < Constants.NumTiles; i++)
+        {
+            for(int j = 0; j < Constants.NumTiles; j++)
+            {
+                matriu[i, j] = 0;
+                //Debug.Log("Nodo 1: " + i + " Nodo 2: " + j + " Valor: " + matriu[i,j]);
+            }
+        }
+        
         //TODO: Para cada posición, rellenar con 1's las casillas adyacentes (arriba, abajo, izquierda y derecha)
+        
 
         //TODO: Rellenar la lista "adjacency" de cada casilla con los índices de sus casillas adyacentes
+        for(int i = 0; i < Constants.NumTiles; i++)
+        {
+
+            if(i == 0 || i == 8 || i == 16 || i == 24 || i == 32 || i == 40 || i == 48 || i == 56)
+            {
+                if (!(i - 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i - 8);
+                }
+                if (!(i + 1 < 0))
+                {
+                    tiles[i].adjacency.Add(i + 1);
+                }
+                if (!(i + 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i + 8);
+                }
+            }
+            else if (i == 7 || i == 15 || i == 23 || i == 31 || i == 39 || i == 47 || i == 55 || i == 63)
+            {
+                if (!(i - 1 < 0))
+                {
+                    tiles[i].adjacency.Add(i - 1);
+                }
+                if (!(i - 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i - 8);
+                }
+                if (!(i + 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i + 8);
+                }
+            }
+            else
+            {
+                if (!(i - 1 < 0))
+                {
+                    tiles[i].adjacency.Add(i - 1);
+                }
+                if (!(i - 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i - 8);
+                }
+                if (!(i + 1 < 0))
+                {
+                    tiles[i].adjacency.Add(i + 1);
+                }
+                if (!(i + 8 < 0))
+                {
+                    tiles[i].adjacency.Add(i + 8);
+                }
+            }
+
+        }
 
     }
 
@@ -189,12 +254,14 @@ public class Controller : MonoBehaviour
     public void FindSelectableTiles(bool cop)
     {
                  
-        int indexcurrentTile;        
+        int indexcurrentTile;
+        List<int> adyacentes = new List<int>();
 
-        if (cop==true)
+        //if (cop==true)
             indexcurrentTile = cops[clickedCop].GetComponent<CopMove>().currentTile;
+        /*
         else
-            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
+            indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;*/
 
         //La ponemos rosa porque acabamos de hacer un reset
         tiles[indexcurrentTile].current = true;
@@ -204,12 +271,43 @@ public class Controller : MonoBehaviour
 
         //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
         //Tendrás que cambiar este código por el BFS
-        for(int i = 0; i < Constants.NumTiles; i++)
+
+        for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
         {
-            tiles[i].selectable = true;
+            adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
         }
 
+        adyacentes.Add(indexcurrentTile);
+        
+        for(int i = 0; i < adyacentes.Count; i++)
+        {
+            Debug.Log(adyacentes[i].ToString());
+        }
 
+        
+        for(int j = 0; j < adyacentes.Count; j++)
+        {
+            for (int i = 0;  i < tiles[adyacentes[j]].adjacency.Count; i++)
+            {
+                tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+            }
+        }
+        /*
+        for (int i = 0; i < Constants.NumTiles; i++)
+        {
+            if (i == indexcurrentTile)
+            {
+                //Debug.Log(indexcurrentTile);
+                for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
+                {
+                    tiles[tiles[indexcurrentTile].adjacency[j]].selectable = true;
+                }
+            }
+
+
+
+        }
+        */
     }
     
    
