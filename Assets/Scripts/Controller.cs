@@ -59,7 +59,6 @@ public class Controller : MonoBehaviour
             for(int j = 0; j < Constants.NumTiles; j++)
             {
                 matriu[i, j] = 0;
-                //Debug.Log("Nodo 1: " + i + " Nodo 2: " + j + " Valor: " + matriu[i,j]);
             }
         }
         
@@ -240,7 +239,6 @@ public class Controller : MonoBehaviour
     public void InitGame()
     {
         state = Constants.Init;
-         
     }
 
     public void IncreaseRoundCount()
@@ -257,9 +255,12 @@ public class Controller : MonoBehaviour
         List<int> adyacentes = new List<int>();
         List<int> casillasRobber = new List<int>();
 
+        // Turno del jugador
         if (cop == true) {
 
+            // Recogemos la casilla del jugador
             indexcurrentTile = cops[clickedCop].GetComponent<CopMove>().currentTile;
+            // Buscamos el otro policia
             if (clickedCop == 0)
             {
                 elOtroCop = 1;
@@ -269,18 +270,13 @@ public class Controller : MonoBehaviour
                 elOtroCop = 0;
             }
 
+            // Añadimos las adyacencias
             for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
             {
                 adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
             }
 
             adyacentes.Add(indexcurrentTile);
-
-            for (int i = 0; i < adyacentes.Count; i++)
-            {
-                //Debug.Log(adyacentes[i].ToString());
-            }
-
 
             for (int j = 0; j < adyacentes.Count; j++)
             {
@@ -288,25 +284,59 @@ public class Controller : MonoBehaviour
                 {
                     if (!(cops[elOtroCop].GetComponent<CopMove>().currentTile == adyacentes[j]))
                     {
-                        /*&& !(cops[elOtroCop].GetComponent<CopMove>().currentTile == tiles[adyacentes[j]].adjacency[i])
-                        Debug.Log("Adyacentes con j " + adyacentes[j]);
-                        Debug.Log("Adyacentes con i " + tiles[adyacentes[j]].adjacency[i]);
-                        */
-                        tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
-                        tiles[cops[elOtroCop].GetComponent<CopMove>().currentTile].selectable = false;
+                        // Mientras no sea tu propia casilla puedes selecionarla
+                        if (!(tiles[tiles[adyacentes[j]].adjacency[i]].numTile == indexcurrentTile))
+                        {
+                            tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                            tiles[cops[elOtroCop].GetComponent<CopMove>().currentTile].selectable = false;
+                        }
+
                     }
                 }
             }
-
+            // Acabamos de añadir las adyacencias
         }
 
+        // Turno del rober
         else
         {
+            // Variables de distancias
+            List<int> distancias = new List<int>();
+            distancias.Add(0);
+            distancias.Add(0);
+
+            int ejeYTotal = 0;
+            int ejeXTotal = 0;
+            List<int> distanciaTotal = new List<int>();
+
+            int mayorDistancia = 0;
+            int casillaAMayorDistancia = 0;
+
+            // Variables del caco
+            int posicionCaco = robber.GetComponent<RobberMove>().currentTile;
+            List<int> ejeYCaco = new List<int>();
+            List<int> ejeXCaco = new List<int>();
+
+            // Variables del los policias
+            List<int> copPosition = new List<int>();
+
+            copPosition.Add(cops[0].GetComponent<CopMove>().currentTile);
+            copPosition.Add(cops[1].GetComponent<CopMove>().currentTile);
+
+            List<int> ejeY = new List<int>();
+            List<int> ejeX = new List<int>();
+
+            // Fin de las variables
+
+            // Empieza la recogida de casillas adyacentes
             indexcurrentTile = robber.GetComponent<RobberMove>().currentTile;
 
             for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
             {
-                adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
+                if (!(tiles[indexcurrentTile].adjacency[j] == copPosition[0] || tiles[indexcurrentTile].adjacency[j] == copPosition[1]))
+                {
+                    adyacentes.Add(tiles[indexcurrentTile].adjacency[j]);
+                }
             }
 
             adyacentes.Add(indexcurrentTile);
@@ -315,41 +345,82 @@ public class Controller : MonoBehaviour
             {
                 for (int i = 0; i < tiles[adyacentes[j]].adjacency.Count; i++)
                 {
-                    tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
-                    casillasRobber.Add(tiles[adyacentes[j]].adjacency[i]);
+                    if (!(tiles[adyacentes[j]].adjacency[i] == copPosition[0] || tiles[adyacentes[j]].adjacency[i] == copPosition[1]))
+                    {
+                        tiles[tiles[adyacentes[j]].adjacency[i]].selectable = true;
+                        casillasRobber.Add(tiles[adyacentes[j]].adjacency[i]);
+                    }
                 }
             }
 
-            int casilla = Random.Range(0, casillasRobber.Count);
-            robber.GetComponent<RobberMove>().MoveToTile(tiles[casillasRobber[casilla]]);
-            robber.GetComponent<RobberMove>().currentTile = casillasRobber[casilla];
+            casillasRobber.Remove(indexcurrentTile);
+
+            // Acaba la recogida de casillas adyacentes     
+
+            // Empieza el calculo de distancia
+         
+            for (int j = 0; j < casillasRobber.Count; j++)
+            {
+                ejeXCaco.Add(casillasRobber[j]);
+                ejeYCaco.Add(0);
+
+                while (ejeXCaco[j] >= 0)
+                {
+                    ejeXCaco[j] -= 8;
+                    //Debug.Log(posicion);
+                    ejeYCaco[j]++;
+                }
+                
+                ejeYCaco[j] -= 1;
+                ejeXCaco[j] += 8;
+
+                // Para la casilla actual polis
+                for (int i = 0; i < copPosition.Count; i++)
+                {
+                    ejeX.Add(copPosition[i]);
+                    ejeY.Add(0);
+                    while (ejeX[i] >= 0)
+                    {
+                        ejeX[i] -= 8;
+                        //Debug.Log(posicion);
+                        ejeY[i]++;
+                    }
+                    ejeY[i] -= 1;
+                    ejeX[i] += 8;
+
+                    ejeYTotal = ejeYCaco[j] - ejeY[i];
+                    if (ejeYTotal < 0)
+                    {
+                        ejeYTotal = ejeYTotal * -1;
+                    }
+
+                    ejeXTotal = ejeXCaco[j] - ejeX[i];
+                    if (ejeXTotal < 0)
+                    {
+                        ejeXTotal = ejeXTotal * -1;
+                    }
+
+                    distancias[i] = ejeYTotal + ejeXTotal;
+                }
+
+                distanciaTotal.Add(distancias[0] + distancias[1]);
+            }
+
+            for(int i = 0; i < distanciaTotal.Count; i++)
+            {
+                if (distanciaTotal[i] >= mayorDistancia)
+                {
+                    mayorDistancia = distanciaTotal[i];
+                    casillaAMayorDistancia = i;
+                }
+            }
+
+            robber.GetComponent<RobberMove>().MoveToTile(tiles[casillasRobber[casillaAMayorDistancia]]);
+            robber.GetComponent<RobberMove>().currentTile = casillasRobber[casillaAMayorDistancia];
         }
         
         //La ponemos rosa porque acabamos de hacer un reset
         tiles[indexcurrentTile].current = true;
-
-        //Cola para el BFS
-        Queue<Tile> nodes = new Queue<Tile>();
-
-        //TODO: Implementar BFS. Los nodos seleccionables los ponemos como selectable=true
-        //Tendrás que cambiar este código por el BFS
-
-        /*
-        for (int i = 0; i < Constants.NumTiles; i++)
-        {
-            if (i == indexcurrentTile)
-            {
-                //Debug.Log(indexcurrentTile);
-                for (int j = 0; j < tiles[indexcurrentTile].adjacency.Count; j++)
-                {
-                    tiles[tiles[indexcurrentTile].adjacency[j]].selectable = true;
-                }
-            }
-
-
-
-        }
-        */
     }
 
 
