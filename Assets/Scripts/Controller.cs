@@ -408,10 +408,13 @@ public class Controller : MonoBehaviour
 
             for(int i = 0; i < distanciaTotal.Count; i++)
             {
-                if (distanciaTotal[i] >= mayorDistancia)
+                if(!(robber.GetComponent<RobberMove>().currentTile == casillasRobber[i]))
                 {
-                    mayorDistancia = distanciaTotal[i];
-                    casillaAMayorDistancia = i;
+                    if (distanciaTotal[i] >= mayorDistancia)
+                    {
+                        mayorDistancia = distanciaTotal[i];
+                        casillaAMayorDistancia = i;
+                    }
                 }
             }
 
@@ -422,13 +425,5 @@ public class Controller : MonoBehaviour
         //La ponemos rosa porque acabamos de hacer un reset
         tiles[indexcurrentTile].current = true;
     }
-
-
-
-
-
-
-
-
 
 }
